@@ -1128,6 +1128,10 @@ void register_buf_comparison(int id)
 		add_function_hook("copy_from_user", &match_copy, NULL);
 		add_function_hook("__copy_from_user", &match_copy, NULL);
 	}
+	if (option_project == PROJ_ILLUMOS_KERNEL) {
+		add_allocation_function("kmem_alloc", &match_alloc, 0);
+		add_allocation_function("kmem_zalloc", &match_alloc, 0);
+	}
 
 	add_allocation_hook(&match_allocation);
 

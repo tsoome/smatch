@@ -128,6 +128,8 @@ void check_frees_argument(int id)
 	add_hook(&match_function_def, FUNC_DEF_HOOK);
 	if (option_project == PROJ_KERNEL)
 		add_function_hook("kfree", &match_kfree, NULL);
+	else if (option_project == PROJ_ILLUMOS_KERNEL)
+		add_function_hook("kmem_free", &match_kfree, NULL);
 	else
 		add_function_hook("free", &match_kfree, NULL);
 	add_hook(&match_return, RETURN_HOOK);
