@@ -19,7 +19,7 @@
 
 /*
  * Heavily borrowed from check_wine.c: what we're doing here is teaching smatch
- * that cmn_err(CE_PANIC, ...) is noreturn.
+ * that cmn_err(CE_PANIC, ...) and ddi_err(DER_PANIC, ...) is noreturn.
  */
 
 #include "scope.h"
@@ -29,7 +29,8 @@
 #define	CE_PANIC (3)
 #define	DER_PANIC (7)
 
-void match_cmn_err(const char *fn, struct expression *expr, void *unused)
+static void
+match_err(const char *fn, struct expression *expr, int value)
 {
 	struct expression *arg;
 	sval_t sval;
@@ -38,21 +39,18 @@ void match_cmn_err(const char *fn, struct expression *expr, void *unused)
 	if (!get_implied_value(arg, &sval))
 		return;
 
-	if (sval.value == CE_PANIC)
+	if (sval.value == value)
 		nullify_path();
+}
+
+void match_cmn_err(const char *fn, struct expression *expr, void *unused)
+{
+	match_err(fn, expr, CE_PANIC);
 }
 
 void match_ddi_err(const char *fn, struct expression *expr, void *unused)
 {
-	struct expression *arg;
-	sval_t sval;
-
-	arg = get_argument_from_call_expr(expr->args, 0);
-	if (!get_implied_value(arg, &sval))
-		return;
-
-	if (sval.value == DER_PANIC)
-		nullify_path();
+	match_err(fn, expr, DER_PANIC);
 }
 
 void check_cmn_err(int id)
